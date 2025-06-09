@@ -14,11 +14,11 @@ A Rust tool to remove special characters from DOCX files while preserving the or
 
 ### Download Pre-built Binaries
 
-Download the latest release for your platform from the [Releases page](https://github.com/your-username/docx-cleaner/releases).
+Download the latest release for your platform from the [Releases page](https://github.com/FabricioArendTorres/remove-invisible-unicode-from-docx/releases).
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/your-username/docx-cleaner.git
+git clone https://github.com/remove-invisible-unicode-from-docx/docx-cleaner.git
 cd docx-cleaner
 cargo build --release
