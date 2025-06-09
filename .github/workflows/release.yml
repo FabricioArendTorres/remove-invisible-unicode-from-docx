@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build-linux:
@@ -11,8 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Cache Cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-linux-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-linux-
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
@@ -23,27 +33,36 @@ jobs:
       - name: Build binary
         run: cargo build --release
 
-      - name: List release files
+      - name: Show contents
         run: ls -lh target/release
 
-      - name: Prepare release artifact
+      - name: Prepare artifact
         run: |
           mkdir -p dist
-          cp target/release/docx_cleaner dist/docx_cleaner-linux-x86_64
+          cp target/release/docx-cleaner dist/docx-cleaner-linux-x86_64
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-binary
-          path: dist/docx_cleaner-linux-x86_64
+          path: dist/docx-cleaner-linux-x86_64
 
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Cache Cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-windows-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-windows-
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
@@ -55,19 +74,18 @@ jobs:
       - name: Build binary
         run: cargo build --release --target x86_64-pc-windows-msvc
 
-      - name: List release files
+      - name: Show contents
         run: Get-ChildItem target\x86_64-pc-windows-msvc\release
 
-      - name: Prepare release artifact
+      - name: Prepare artifact
         run: |
           mkdir dist
-          copy target\x86_64-pc-windows-msvc\release\docx_cleaner.exe dist\docx_cleaner-windows-x86_64.exe
+          copy target\x86_64-pc-windows-msvc\release\docx-cleaner.exe dist\docx-cleaner-windows-x86_64.exe
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-binary
-          path: dist/docx_cleaner-windows-x86_64.exe
+          path: dist/docx-cleaner-windows-x86_64.exe
 
   release:
     name: Create GitHub Release
@@ -91,7 +109,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/docx_cleaner-linux-x86_64
-            dist/docx_cleaner-windows-x86_64.exe
+            dist/docx-cleaner-linux-x86_64
+            dist/docx-cleaner-windows-x86_64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
